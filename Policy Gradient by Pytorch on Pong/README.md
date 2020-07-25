@@ -1,5 +1,5 @@
 # Policy Gradient on Gym Pong
-Pytorch is required.  
+[Pytorch](https://pytorch.org/get-started/locally/) is required.  
 
 ## Installation
 Type the following command to install OpenAI Gym Atari environment.
