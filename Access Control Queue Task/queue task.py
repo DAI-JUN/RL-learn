@@ -1,9 +1,10 @@
 import numpy as np
 import seaborn
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 
-class Env():
+class Env:
     def __init__(self, num_server=10, p=0.06):
         self.request = [1, 2, 4, 8]
         self.num_server = num_server
@@ -27,7 +28,7 @@ class Env():
         return 0, self.num_left, self.now_request
 
 
-class valuef():
+class valuef:
     def __init__(self, learning_rate=0.01, reward_update_rate=0.01):
         self.lr = learning_rate
         self.rur = reward_update_rate
@@ -48,6 +49,8 @@ class valuef():
 
 
 def make_action(valuef, num_left, request, epsilon=0.1):
+    if num_left == 0:
+        return 0
     if np.random.rand() < epsilon:
         return np.random.choice([0, 1])
     value = []
@@ -71,15 +74,14 @@ def print_policy(valuef):
     plt.show()
 
 
-T = 10000000
+T = 1000000
 t = 0
 env = Env()
 q = valuef()
 _, num_left, request = env.reset()
 action = make_action(q, num_left, request)
 
-while t < T:
-    t += 1
+for t in tqdm(range(T)):
     reward, next_num, next_request = env.step(action)
     next_action = make_action(q, next_num, next_request)
     q.learn([num_left, request, action], [next_num, next_request, next_action], reward)
