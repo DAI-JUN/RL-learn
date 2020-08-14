@@ -1,4 +1,6 @@
 import numpy as np
+import seaborn
+import matplotlib.pyplot as plt
 
 
 class Env():
@@ -11,8 +13,8 @@ class Env():
 
     def reset(self):
         self.now_request = np.random.choice(self.request)
-
         return 0, self.num_left, self.now_request
+
     def step(self, action):
         # action 1: accept , action 0: reject
         if action == 1 and self.num_left:
@@ -29,16 +31,20 @@ class valuef():
     def __init__(self, learning_rate=0.01, reward_update_rate=0.01):
         self.lr = learning_rate
         self.rur = reward_update_rate
-        self.w = np.zeros((3, 200))
+        self.w = np.zeros(200)
+        self.l = []
         self.r_mean = 0
 
     def value(self, state):
-        return np.sum(np.dot(np.array(state), self.w))
+        if state not in self.l:
+            self.l.append(state)
+        return self.w[self.l.index(state)]
 
     def learn(self, now_state, next_state, reward):
         delta = reward - self.r_mean + self.value(next_state) - self.value(now_state)
         self.r_mean += self.rur * delta
-        self.w += self.lr * delta * np.array(now_state)
+        update_factor = self.lr * delta
+        self.w[self.l.index(now_state)] += update_factor
 
 
 def make_action(valuef, num_left, request, epsilon=0.1):
@@ -50,7 +56,22 @@ def make_action(valuef, num_left, request, epsilon=0.1):
     return value.index(max(value))
 
 
-T = 100000
+def print_policy(valuef):
+
+    policy = np.zeros((4, 11))
+    requests = [1, 2, 4, 8]
+    for index, request in enumerate(requests):
+        for servers in range(1, 11):
+            policy[index][servers] = make_action(valuef, servers, request, epsilon=0)
+
+    fig = seaborn.heatmap(policy, cmap="YlGnBu", xticklabels=range(1, 11), yticklabels=requests)
+    fig.set_title('Policy (0 Reject, 1 Accept)')
+    fig.set_xlabel('Number of free servers')
+    fig.set_ylabel('Priority')
+    plt.show()
+
+
+T = 1000000
 t = 0
 env = Env()
 q = valuef()
@@ -66,3 +87,4 @@ while t < T:
     num_left = next_num
     request = next_request
 
+print_policy(q)
