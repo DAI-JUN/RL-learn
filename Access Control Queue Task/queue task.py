@@ -58,11 +58,11 @@ def make_action(valuef, num_left, request, epsilon=0.1):
 
 def print_policy(valuef):
 
-    policy = np.zeros((4, 11))
+    policy = np.zeros((4, 10))
     requests = [1, 2, 4, 8]
     for index, request in enumerate(requests):
-        for servers in range(1, 11):
-            policy[index][servers] = make_action(valuef, servers, request, epsilon=0)
+        for servers in range(10):
+            policy[index][servers] = make_action(valuef, servers + 1, request, epsilon=0)
 
     fig = seaborn.heatmap(policy, cmap="YlGnBu", xticklabels=range(1, 11), yticklabels=requests)
     fig.set_title('Policy (0 Reject, 1 Accept)')
@@ -71,7 +71,7 @@ def print_policy(valuef):
     plt.show()
 
 
-T = 1000000
+T = 10000000
 t = 0
 env = Env()
 q = valuef()
