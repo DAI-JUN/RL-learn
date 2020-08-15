@@ -74,7 +74,7 @@ def print_policy(valuef):
     plt.show()
 
 
-T = 1000000
+T = 10000000
 t = 0
 env = Env()
 q = valuef()
